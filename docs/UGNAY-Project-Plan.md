@@ -154,19 +154,11 @@ This is the design decision that makes "city-wide" tractable rather than just a 
 
 **Cross-platform vs. native — the recommendation:** use **cross-platform (Expo)**. The thesis contribution is the *integrated workflow*, not native performance. Native Android would buy you marginally better camera/GPS performance and cost you the iOS path, the OTA update capability, and roughly 3 sprints of the mobile developer's time. Ship Android-first via Expo, sideloaded APK or Google Play internal testing track; document iOS as Future Work.
 
-### 1.6 Team roles
+### 1.6 Team
 
-Five members, five primary roles. Everyone writes thesis chapters — the role determines *which* sections you own, not whether you write.
+Five members: **Follante, Manalo, Ramos, Rivera, Torculas**. Roles and ownership have **not been finalized** and will be assigned by the team. Everyone writes thesis chapters.
 
-| Member | Primary role | Owns (technical) | Owns (manuscript) |
-|---|---|---|---|
-| **Follante** | Product Owner / Scrum Master · LGU & Ethics Liaison | Backlog, sprint ceremonies, LGU permission letter, ethics clearance packet, stakeholder demos | Ch. 1 (Introduction, Objectives, Scope), Ch. 3 (Research Design, Respondents, Ethics) |
-| **Manalo** | Backend & Database Lead | FastAPI, SQLAlchemy models, Alembic migrations, PostGIS, priority scoring service, notification dispatcher, API contract | Ch. 3 (System Architecture, ERD, Data Dictionary, Priority Algorithm) |
-| **Ramos** | Mobile Lead (React Native/Expo) | Entire resident app, EAS builds, push registration, GPS/map-pin, offline drafts, APK distribution | Ch. 3 (Mobile Module Design), Ch. 4 (Mobile screenshots + resident results) |
-| **Rivera** | Web / Frontend Lead (React) | Entire officials' web app, admin + personnel modules, dashboard, Leaflet heatmap, report exports | Ch. 3 (Web Module Design), Ch. 4 (Dashboard results, heatmap figures) |
-| **Torculas** | QA, Documentation & Research Lead | Test plans, E2E test suite, RBAC test matrix, SUS/TAM instrument construction, baseline field-study coordination, statistical analysis | Ch. 2 (RRL, full), Ch. 4 (Results & Discussion, statistical tables), Ch. 5 (Conclusions) |
-
-**Secondary / cross-cover** (so no single point of failure): Manalo backs up Rivera on web; Ramos backs up Manalo on API endpoints; Torculas backs up Follante on LGU coordination; Follante backs up Ramos on mobile QA. Every member takes at least one turn as sprint demo presenter.
+**Areas of work that need an owner and a named backup** (so no single point of failure): product backlog and sprint ceremonies · LGU liaison and ethics clearance · backend and database · mobile app · web app · QA and testing · research instruments and statistical analysis · thesis chapters. Every member takes at least one turn as sprint demo presenter.
 
 **Cadence:** sprint planning Monday of odd weeks (1.5 h), async daily standup in a group chat (3 lines: done / doing / blocked), sprint review + retrospective Friday of even weeks (1.5 h), adviser consultation at least once per sprint.
 
@@ -561,13 +553,13 @@ Likelihood / Impact: **L** = Low, **M** = Medium, **H** = High.
 | **R1** | LGU approval is delayed or refused, blocking baseline access and pilot deployment | Stakeholder | **H** | **H** | Submit the permission letter in **Week 1**, not after the proposal defense. Approach **three** candidate cities in parallel and proceed with whichever responds first. Have the adviser or Dean co-sign. Escalate through a faculty member with an existing LGU contact. Track weekly; declare a decision point at Week 6. |
 | **R2** | Institutional ethics/research clearance is delayed | Ethics | **M** | **H** | Prepare the full packet (protocol, instruments, consent forms, privacy notice, data management plan) during **Sprint 0** and submit by Week 2. Sequence work so no sprint before Week 8 depends on clearance. Build with **synthetic seed data** until clearance arrives. |
 | **R3** | City-wide scope proves too large for 29 working weeks | Schedule | **H** | **H** | Scope is controlled by the **MoSCoW gate**: only Must-Haves are committed. Barangay is a *tagging and filtering dimension*, not per-barangay feature work — this is what keeps "city-wide" from multiplying effort. Pilot promotion can be staged (5 barangays in Week 22, city-wide in Week 24) without changing the code. |
-| **R4** | Building two clients with 5 people overruns the mobile or web track | Technical/Schedule | **H** | **H** | Backend + OpenAPI contract land in Sprints 1–2 so mobile and web proceed in parallel from Sprint 2. Both clients use TypeScript/React so Ramos and Rivera can cover each other. If one track slips, the web app is prioritized (it carries Objectives 3 and 5) and mobile Should-Haves are cut first. |
+| **R4** | Building two clients with 5 people overruns the mobile or web track | Technical/Schedule | **H** | **H** | Backend + OpenAPI contract land in Sprints 1–2 so mobile and web proceed in parallel from Sprint 2. Both clients use TypeScript/React so the members working on each client can cover each other. If one track slips, the web app is prioritized (it carries Objectives 3 and 5) and mobile Should-Haves are cut first. |
 | **R5** | APK distribution friction and Android device fragmentation | Technical | **M** | **M** | Ship via **Google Play internal testing track** (one-time $25 developer fee) plus a direct APK with written sideload instructions. Test on a minimum device matrix: Android 8/11/14, one low-RAM device, one without Google Play Services. Use Expo OTA updates so pilot fixes do not require reinstallation. |
 | **R6** | Low participation in evaluation (residents or staff) | Stakeholder | **H** | **H** | Recruit through barangay officials, not cold outreach. Run **assisted, on-site sessions** at the barangay hall rather than relying on self-service links. Cap the survey at 12 minutes. Offer certificates of participation. Over-recruit by 40%. Begin recruitment in Week 18, not Week 24. |
 | **R7** | GPS inaccuracy produces mis-located or mis-tagged reports | Technical/Data | **M** | **M** | Always show the accuracy radius; auto-fall back to manual pin above 50 m (US-06). Record `location_source` and `accuracy_m` as analysis variables. Boundary-straddling points route to the admin queue rather than being silently mis-assigned. Report GPS accuracy distribution as a Chapter 4 finding. |
 | **R8** | Map API cost, quota throttling, or a billing requirement | Technical/Budget | **L** | **M** | **Eliminated by design**: OpenStreetMap + Leaflet requires no key, no quota, and no card. Follow the OSM tile usage policy; if volume ever became an issue, switch to a free MapTiler or Stadia key. Do not introduce Google Maps Platform on the web client. |
-| **R9** | Scope creep from LGU stakeholders requesting extra features mid-pilot | Stakeholder/Schedule | **H** | **M** | A written scope agreement signed at kickoff. All new requests go to a visible **"Future Work" backlog column** — acknowledged, logged, not built. Follante is the single point of contact for requests; only the PO can move an item into a sprint. |
-| **R10** | A team member becomes unavailable (illness, OJT, academic load, withdrawal) | Schedule | **M** | **H** | Every role has a named backup (§1.6). No knowledge is held by one person: all decisions land in the repo (ADRs), all credentials in a shared vault, all work in tracked issues. Mandatory PR review by a second member. Plan to ~85% of theoretical capacity so a buffer exists. |
+| **R9** | Scope creep from LGU stakeholders requesting extra features mid-pilot | Stakeholder/Schedule | **H** | **M** | A written scope agreement signed at kickoff. All new requests go to a visible **"Future Work" backlog column** — acknowledged, logged, not built. One designated point of contact (to be assigned) handles requests; only that person can move an item into a sprint. |
+| **R10** | A team member becomes unavailable (illness, OJT, academic load, withdrawal) | Schedule | **M** | **H** | Every area of work has a named backup once roles are assigned (§1.6). No knowledge is held by one person: all decisions land in the repo (ADRs), all credentials in a shared vault, all work in tracked issues. Mandatory PR review by a second member. Plan to ~85% of theoretical capacity so a buffer exists. |
 | **R11** | Data privacy breach or accidental exposure of resident personal data | Ethics/Data | **L** | **H** | Presigned short-lived media URLs; no public endpoints returning PII; role-gated contact details with audit logging; secrets never committed (CI secret scanning); HTTPS everywhere; a pre-deployment security review sprint (Sprint 8) with an explicit RA 10173 checklist; a written breach-response procedure naming the LGU contact. |
 | **R12** | Low resident adoption during the pilot — too few reports to analyze | Stakeholder | **H** | **H** | Coordinate a launch orientation with barangay officials; posters with QR codes at barangay halls; a 3-minute onboarding video in Filipino. Set a **minimum viable pilot dataset of 60 reports**; if volume is short by Week 25, run structured scenario-based sessions with recruited residents to generate additional valid reports, and report this explicitly as a methodological limitation. |
 | **R13** | Cloud hosting costs exceed the student budget | Budget | **L** | **M** | Free tiers throughout (Render/Railway, Supabase/Neon, Cloudflare R2, Vercel, Brevo). Set billing alerts at ₱0 where supported. Hold **₱3,000** contingency (₱1,500 hosting fallback + ₱1,400 Play Store fee). Image downscaling and a 10 MB/report cap keep storage inside free limits. |
@@ -590,7 +582,7 @@ Likelihood / Impact: **L** = Low, **M** = Medium, **H** = High.
 *Trigger:* cumulative Must-Have completion is below 60% at the end of Sprint 5, or two consecutive sprints miss their goal.
 
 1. **Immediately:** cut all Should-Haves except US-29 (heatmap) and US-30 (barangay filters) — these two carry Objective 5 and cannot be dropped. Everything else moves to Future Work in the manuscript.
-2. **Reallocate:** Manalo and Torculas move onto whichever client track is behind for two sprints; backend work reduces to defect fixes and endpoints the clients are actively blocked on.
+2. **Reallocate:** two members (typically backend and QA) move onto whichever client track is behind for two sprints; backend work reduces to defect fixes and endpoints the clients are actively blocked on.
 3. **Feature degradation ladder** (apply in this order, stopping as soon as the schedule recovers):
    - Email notifications → in-app only (keep push, which residents actually see)
    - PDF export → CSV export only
@@ -619,7 +611,7 @@ Likelihood / Impact: **L** = Low, **M** = Medium, **H** = High.
 Every user story, in every sprint, must satisfy all of the following before it is counted:
 
 1. Code merged to `main` via pull request, reviewed and approved by at least one other member.
-2. All acceptance criteria demonstrably met, verified by the QA lead against the written criteria.
+2. All acceptance criteria demonstrably met, verified by a team member other than the author against the written criteria.
 3. Unit tests written for backend business logic; CI (lint + tests) green.
 4. API changes reflected in the OpenAPI spec and the Postman collection.
 5. Database changes delivered as an Alembic migration that runs cleanly on a fresh database.
@@ -631,7 +623,7 @@ Every user story, in every sprint, must satisfy all of the following before it i
 
 ### 4.1 Parallel research track (runs across all sprints)
 
-This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is scheduled independently of the build.
+This track is scheduled independently of the build. Its owners (a research lead and an LGU liaison) are to be assigned.
 
 | Weeks | Research activity | Gate |
 |---|---|---|
@@ -652,18 +644,18 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 
 **Sprint goal:** Everything needed to start building and to start the research clock is in place, and no downstream sprint is blocked on a decision that could have been made now.
 
-| Area | Tasks | Owner |
-|---|---|---|
-| **Requirements** | Finalize backlog in GitHub Projects; MoSCoW classification agreed and frozen; write the scope agreement for LGU signature; confirm the 9 baseline metrics and their operational definitions | Follante, Torculas |
-| **Stakeholder/Ethics** | Draft + send LGU permission letters to 3 candidate cities; assemble ethics packet (protocol, instruments, consent forms, privacy notice, data management plan); submit to the review committee | Follante |
-| **Design — Mobile** | Wireframes for 9 screens: onboarding, register, privacy consent, submit (3 steps: details → photo → location), my reports, report detail/timeline, resolution view, rating, settings | Ramos |
-| **Design — Web** | Wireframes for 8 screens: login, admin validation queue, report detail + priority panel, assignment, personnel queue, resolution upload, dashboard, reports/export | Rivera |
-| **Data design** | ERD covering 14 entities: `users`, `roles`, `offices`, `barangays` (PostGIS), `reports`, `report_media`, `report_status_history`, `assignments`, `priority_scores`, `resolutions`, `resolution_media`, `ratings`, `notifications`, `consents`, `audit_logs`; data dictionary | Manalo |
-| **API contract** | Author the OpenAPI 3.1 spec **first** — all endpoints, request/response schemas, error shapes, auth scheme. This is the contract that unblocks parallel client work. Publish a Postman collection with mock responses | Manalo, reviewed by Ramos + Rivera |
-| **Priority algorithm** | Define the scoring rubric: factor scales (1–5 each), weights, category weight table, location sensitivity table, band thresholds; write it up for Ch. 3 | Manalo, Torculas |
-| **Infrastructure** | GitHub repo (monorepo: `/api`, `/mobile`, `/web`, `/docs`); branch protection on `main`; GitHub Actions CI (ruff + pytest + eslint + tsc); provision staging Postgres with PostGIS; Render/Railway staging service; Cloudflare R2 bucket; shared secrets vault | Manalo, Torculas |
-| **Spikes** | (a) PostGIS point-in-polygon with real barangay shapefiles — 4 h; (b) Expo push notification round-trip on a physical device — 4 h; (c) Leaflet heatmap with 1,000 synthetic points — 3 h. **Each spike must produce a working proof, not a report.** | Manalo, Ramos, Rivera |
-| **Thesis** | Ch. 1 complete draft; Ch. 2 RRL outline with 25+ sources identified; Ch. 3 methodology skeleton | All; Torculas coordinates |
+| Area | Tasks |
+|---|---|
+| **Requirements** | Finalize backlog in GitHub Projects; MoSCoW classification agreed and frozen; write the scope agreement for LGU signature; confirm the 9 baseline metrics and their operational definitions |
+| **Stakeholder/Ethics** | Draft + send LGU permission letters to 3 candidate cities; assemble ethics packet (protocol, instruments, consent forms, privacy notice, data management plan); submit to the review committee |
+| **Design — Mobile** | Wireframes for 9 screens: onboarding, register, privacy consent, submit (3 steps: details → photo → location), my reports, report detail/timeline, resolution view, rating, settings |
+| **Design — Web** | Wireframes for 8 screens: login, admin validation queue, report detail + priority panel, assignment, personnel queue, resolution upload, dashboard, reports/export |
+| **Data design** | ERD covering 14 entities: `users`, `roles`, `offices`, `barangays` (PostGIS), `reports`, `report_media`, `report_status_history`, `assignments`, `priority_scores`, `resolutions`, `resolution_media`, `ratings`, `notifications`, `consents`, `audit_logs`; data dictionary |
+| **API contract** | Author the OpenAPI 3.1 spec **first** — all endpoints, request/response schemas, error shapes, auth scheme. This is the contract that unblocks parallel client work. Publish a Postman collection with mock responses |
+| **Priority algorithm** | Define the scoring rubric: factor scales (1–5 each), weights, category weight table, location sensitivity table, band thresholds; write it up for Ch. 3 |
+| **Infrastructure** | GitHub repo (monorepo: `/api`, `/mobile`, `/web`, `/docs`); branch protection on `main`; GitHub Actions CI (ruff + pytest + eslint + tsc); provision staging Postgres with PostGIS; Render/Railway staging service; Cloudflare R2 bucket; shared secrets vault |
+| **Spikes** | (a) PostGIS point-in-polygon with real barangay shapefiles — 4 h; (b) Expo push notification round-trip on a physical device — 4 h; (c) Leaflet heatmap with 1,000 synthetic points — 3 h. **Each spike must produce a working proof, not a report.** |
+| **Thesis** | Ch. 1 complete draft; Ch. 2 RRL outline with 25+ sources identified; Ch. 3 methodology skeleton |
 
 **Deliverables:** frozen backlog · LGU letters sent · ethics packet submitted · mobile + web wireframes · ERD + data dictionary · OpenAPI spec v1 · priority rubric · running CI on a staging environment · 3 completed spikes · Ch. 1 draft.
 
@@ -682,10 +674,10 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 | **Backend** | FastAPI project scaffold; SQLAlchemy 2.0 models for all 14 entities; Alembic initial migration; argon2 password hashing; JWT access + refresh with rotation; RBAC dependency (`require_role`); registration + email verification; enable PostGIS, load barangay polygons, implement `ST_Contains` resolution service; retention policy written and the anonymization routine stubbed; **seed script generating 1,000 synthetic reports across all barangays** |
 | **Mobile** | Expo project init; navigation skeleton; design system (colors, typography, components); API client with token refresh interceptor; login + register screens wired to the live API |
 | **Web** | Vite + React + TS + Tailwind scaffold; routing with role-guarded routes; TanStack Query setup; API client; login screen wired to the live API; app shell (sidebar, header, role-aware nav) |
-| **Thesis** | Ch. 2 RRL drafting begins (Torculas); Ch. 3 system architecture + ERD sections written from the Sprint 0 artifacts (Manalo) |
+| **Thesis** | Ch. 2 RRL drafting begins; Ch. 3 system architecture + ERD sections written from the Sprint 0 artifacts |
 | **Research** | LGU follow-ups; baseline instrument design; ethics revisions if requested |
 
-**Owners:** Manalo (backend, lead) · Ramos (mobile) · Rivera (web) · Torculas (tests + Ch. 2) · Follante (LGU + PO)
+**Owners:** to be assigned.
 
 **Deliverables:** deployed API with auth on staging · migrated schema with PostGIS · barangay tagging service with passing tests · 1,000-report seed dataset · both client shells authenticating against the live API.
 
@@ -707,7 +699,7 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 | **Thesis** | Ch. 3 mobile module design; Ch. 3 privacy/ethics section; Ch. 2 RRL continues |
 | **Research** | Baseline instruments finalized; ethics clearance expected in this window |
 
-**Owners:** Ramos (mobile, lead) · Rivera (web) · Manalo (backend) · Torculas (QA + Ch. 2) · Follante (LGU)
+**Owners:** to be assigned.
 
 **Deliverables:** working mobile submission flow · admin validation queue · consent audit records · end-to-end demo: phone → API → admin screen.
 
@@ -729,7 +721,7 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 | **Thesis** | Ch. 3 priority algorithm section with the full rubric, weights, and worked examples; Ch. 3 web module design |
 | **Research** | **Ethics clearance in hand**; baseline field collection begins (historical records + prospective logging setup) |
 
-**Owners:** Manalo (scoring) · Ramos (location) · Rivera (priority UI) · Torculas (algorithm tests + Ch. 3) · Follante (baseline coordination)
+**Owners:** to be assigned.
 
 **Deliverables:** GPS + manual-pin capture with fallback · deterministic scoring engine · explainability panel · override audit trail.
 
@@ -751,7 +743,7 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 | **Thesis** | Ch. 3 workflow and state-machine documentation; Ch. 2 RRL first full draft due |
 | **Research** | **Baseline field collection in progress** — prospective parallel logging live at the LGU receiving desk |
 
-**Owners:** Rivera (web, lead) · Manalo (backend) · Ramos (mobile support) · Torculas (state-machine tests) · Follante (baseline fieldwork)
+**Owners:** to be assigned.
 
 **Deliverables:** complete assignment flow · personnel queue · enforced lifecycle with an append-only audit trail · office/personnel administration.
 
@@ -773,7 +765,7 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 | **Thesis** | Ch. 3 notification architecture; Ch. 4 outline; screenshots captured for the manuscript |
 | **Research** | Baseline collection continues; mid-collection quality check |
 
-**Owners:** Ramos (mobile, lead) · Manalo (notifications) · Rivera (resolution form) · Torculas (E2E of the full loop) · Follante (baseline)
+**Owners:** to be assigned.
 
 **Deliverables:** resolution documentation with photo evidence · full status transparency on mobile · working push, email, and in-app notifications.
 
@@ -787,10 +779,10 @@ This track is owned by **Torculas (lead)** and **Follante (LGU liaison)** and is
 
 Not a sprint. Expect ~25% of normal capacity. Committed work only:
 
-- Ch. 1–3 consolidated and submitted to the adviser for review (Torculas coordinating; all contribute)
-- Baseline data entry, cleaning, and preliminary descriptive analysis (Follante, Torculas)
+- Ch. 1–3 consolidated and submitted to the adviser for review (coordinator to be assigned; all contribute)
+- Baseline data entry, cleaning, and preliminary descriptive analysis
 - Defect backlog burn-down from Sprints 1–5 (whoever is available)
-- Evaluation instrument drafting — SUS, TAM, D&M, ECT item pools (Torculas)
+- Evaluation instrument drafting — SUS, TAM, D&M, ECT item pools
 - **No new features.** Protecting this boundary is what makes the January sprints achievable.
 
 ---
@@ -809,7 +801,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Thesis** | Ch. 3 analytics design; Ch. 4 results structure; **baseline preliminary findings written up** |
 | **Research** | **Baseline analysis complete; as-is flowchart validated and signed by the LGU focal person** |
 
-**Owners:** Rivera (dashboard, lead) · Manalo (aggregation) · Ramos (rating) · Torculas (Ch. 4 structure) · Follante (LGU sign-off)
+**Owners:** to be assigned.
 
 **Deliverables:** resident rating flow · working analytics dashboard with city-wide and per-barangay views · **signed Baseline Report v1.0**.
 
@@ -833,7 +825,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Thesis** | Ch. 3 GIS implementation; Ch. 4 figure preparation; **evaluation instruments finalized and content-validated by 3 evaluators** |
 | **Research** | **Participant recruitment begins**; barangay captain endorsements secured; instruments pilot-tested on 5 respondents; Cronbach's α computed |
 
-**Owners:** Rivera (heatmap + exports, lead) · Manalo (PostGIS + duplicates) · Ramos (mobile notice) · Torculas (instrument validation) · Follante (recruitment)
+**Owners:** to be assigned.
 
 **Deliverables:** GIS heatmap with filters · PDF/CSV administrative reports · duplicate detection and linking · validated evaluation instruments · 40+ pre-registered participants.
 
@@ -856,7 +848,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Thesis** | Ch. 3 finalized; Ch. 4 methodology for evaluation; **privacy compliance checklist evidence compiled** |
 | **Research** | Training materials for LGU staff; 3-minute onboarding video in Filipino; posters with QR codes; deployment runbook |
 
-**Owners:** Torculas (QA + security, lead) · Manalo (backend hardening) · Ramos (mobile release prep) · Rivera (web polish) · Follante (training materials)
+**Owners:** to be assigned.
 
 **Deliverables:** hardened system · passing E2E suite · completed RA 10173 checklist · load test report · signed APK on the internal testing track · staff training materials · deployment runbook.
 
@@ -880,7 +872,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Thesis** | Ch. 4 deployment documentation; UAT results written up; screenshots and figures finalized |
 | **Research** | **Staged launch**: 5 barangays Week 22 → city-wide Week 24; barangay orientation sessions; poster and QR distribution |
 
-**Owners:** Follante (deployment coordination + training, lead) · Manalo (production infra) · Ramos (app distribution) · Rivera (web production) · Torculas (UAT facilitation)
+**Owners:** to be assigned.
 
 **Deliverables:** **live production system** · trained LGU staff · UAT reports for all three groups · onboarded residents · monitoring and verified backups.
 
@@ -905,7 +897,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Thesis** | Ch. 4 drafting from live data; Ch. 5 outline |
 | **⚠️ Checkpoint (end of Week 25)** | **C3 trigger review**: fewer than 30 reports or fewer than 15 pre-registered respondents → activate reporting clinics immediately |
 
-**Owners:** all five on a support rota; Torculas leads data capture; Follante leads LGU liaison.
+**Owners:** all five on a support rota; data-capture and LGU-liaison leads to be assigned.
 
 **Deliverables:** stable 2-week operation · observation logs · issue log · interim metric extract · mid-pilot checkpoint decision documented.
 
@@ -928,7 +920,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Thesis** | Ch. 4 results drafting; data cleaning and coding of open-ended responses |
 | **End of Week 27** | **Pilot formally closes.** Data collection is closed. Residents are notified that the pilot period has ended and told how their reports will continue to be handled by the LGU. |
 
-**Owners:** Torculas (evaluation, lead) · Follante (field coordination) · all (survey administration sessions)
+**Owners:** to be assigned.
 
 **Deliverables:** complete evaluation dataset across three groups · post-deployment metrics extract · interview transcripts · completed privacy compliance checklist · pilot closure notice issued.
 
@@ -949,7 +941,7 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 | **Technical docs** | System manual, installation guide, API documentation, database dictionary, source code appendices, deployment runbook |
 | **Review** | Adviser review round; grammar and format checking; plagiarism/similarity check; complete reference list in the required style |
 
-**Owners:** Torculas (analysis + Ch. 4/5, lead) · all members write their owned sections · Follante coordinates adviser review.
+**Owners:** to be assigned.
 
 **Deliverables:** complete statistical analysis with archived outputs · Ch. 4 and Ch. 5 drafts · full technical documentation · adviser-reviewed manuscript.
 
@@ -961,8 +953,8 @@ Not a sprint. Expect ~25% of normal capacity. Committed work only:
 
 | Week | Activity | Owner |
 |---|---|---|
-| 30 | Manuscript revisions from adviser feedback; final formatting; appendices assembled (instruments, consent forms, ethics clearance, LGU permission, code listings, raw data summaries) | All; Torculas coordinates |
-| 30 | Defense presentation deck (~20 slides); live demo script and a **recorded backup video** of the full workflow (never rely on live internet at a defense) | Follante, Ramos, Rivera |
+| 30 | Manuscript revisions from adviser feedback; final formatting; appendices assembled (instruments, consent forms, ethics clearance, LGU permission, code listings, raw data summaries) | All |
+| 30 | Defense presentation deck (~20 slides); live demo script and a **recorded backup video** of the full workflow (never rely on live internet at a defense) | To be assigned |
 | 31 | **Mock defense** with the adviser and a panel of peers; anticipated-questions drill covering methodology, statistics, privacy, scope limitations, and the priority algorithm | All |
 | 31 | Revisions from mock defense; final manuscript printing and submission per institutional deadline | All |
 | 32 | **FINAL DEFENSE**; post-defense revisions; final deposit; **turnover to the LGU** — system handover documentation, admin credentials, and a written statement of the post-pilot arrangement | All |
@@ -1090,7 +1082,7 @@ All instruments are content-validated by the adviser plus two faculty/IT evaluat
 | **Security — physical** | Managed cloud hosting with the provider's controls documented · no PII on personal devices or in the repository · local research data encrypted |
 | **Data subject rights** | In-app account deletion request · access to one's own data · correction path via support · rights stated in the privacy notice |
 | **Retention & disposal** | Written retention schedule · anonymization routine implemented and tested · deletion actioned within 30 days |
-| **Accountability** | Audit log of every PII read with actor and timestamp · append-only status history · designated team privacy focal person (Torculas) |
+| **Accountability** | Audit log of every PII read with actor and timestamp · append-only status history · designated team privacy focal person (to be assigned) |
 
 ### 5.4 Success criteria
 
@@ -1184,7 +1176,7 @@ These are gaps or contradictions in the project description that should be settl
 
 How to confirm this plan is working, at each level:
 
-**Per sprint** — the Global Definition of Done (§4.0) is checked story-by-story by the QA lead before the sprint review. A sprint is not "done" because the code exists; it is done when it runs on staging and a second person has verified each acceptance criterion.
+**Per sprint** — the Global Definition of Done (§4.0) is checked story-by-story by a member other than the author before the sprint review. A sprint is not "done" because the code exists; it is done when it runs on staging and a second person has verified each acceptance criterion.
 
 **Per milestone** — each of M1–M14 has a single binary test:
 - M3/M6: the **end-to-end demo runs on staging in front of the whole team**, from a physical Android phone through to the web dashboard, without a developer touching the database.

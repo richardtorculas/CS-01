@@ -1,0 +1,29 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.expo/
+web-build/
+
+# Data (baseline/research data with personal info must never be committed)
+docs/research/baseline/raw/
+api/data/*.shp
+api/data/*.dbf
+api/data/*.shx
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
