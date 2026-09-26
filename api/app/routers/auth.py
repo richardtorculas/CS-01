@@ -5,10 +5,10 @@ from app.core.config import Settings, get_settings
 from app.db.session import get_db
 from app.models import User
 from app.routers.deps import get_current_user
-from app.schemas.auth import LoginRequest, TokenResponse, VerifyEmailRequest
+from app.schemas.auth import LoginRequest, RefreshRequest, TokenResponse, VerifyEmailRequest
 from app.schemas.errors import ErrorResponse
 from app.schemas.user import RegisterRequest, UserResponse
-from app.services import auth_service, email_service
+from app.services import auth_service, email_service, token_service
 from app.services.email_service import EmailSender, get_email_sender
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -22,6 +22,14 @@ def _queue_verification_email(background: BackgroundTasks, sender: EmailSender, 
         to_email=user.email,
         to_name=user.name,
         token=auth_service.issue_verification_token(user),
+    )
+
+
+def _token_response(settings: Settings, access: str, refresh: str) -> TokenResponse:
+    return TokenResponse(
+        access_token=access,
+        refresh_token=refresh,
+        expires_in=settings.access_token_minutes * 60,
     )
 
 
@@ -49,10 +57,24 @@ def login(
     settings: Settings = Depends(get_settings),
 ) -> TokenResponse:
     user = auth_service.authenticate(db, email=payload.email, password=payload.password)
-    return TokenResponse(
-        access_token=auth_service.issue_access_token(user),
-        expires_in=settings.access_token_minutes * 60,
-    )
+    access, refresh = token_service.issue_token_pair(db, user)
+    return _token_response(settings, access, refresh)
+
+
+@router.post("/refresh", response_model=TokenResponse, responses={401: {"model": ErrorResponse}})
+def refresh(
+    payload: RefreshRequest,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+) -> TokenResponse:
+    access, new_refresh = token_service.rotate(db, payload.refresh_token)
+    return _token_response(settings, access, new_refresh)
+
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(payload: RefreshRequest, db: Session = Depends(get_db)) -> Response:
+    token_service.revoke(db, payload.refresh_token)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post(

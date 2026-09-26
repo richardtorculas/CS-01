@@ -14,6 +14,8 @@ _STATUS_BY_ERROR: dict[type[exc.DomainError], int] = {
     exc.AuthenticationRequiredError: 401,
     exc.InvalidVerificationTokenError: 400,
     exc.EmailNotVerifiedError: 403,
+    exc.InvalidRefreshTokenError: 401,
+    exc.InsufficientRoleError: 403,
 }
 
 

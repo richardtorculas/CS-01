@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(min_length=32)
     jwt_algorithm: str = "HS256"
     access_token_minutes: int = 15
+    refresh_token_days: int = 7
     email_verification_hours: int = 24
     verification_link_base: str = "ugnay://verify-email"
     brevo_api_key: str = ""

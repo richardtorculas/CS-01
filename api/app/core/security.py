@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -65,3 +67,12 @@ def decode_token(token: str, expected_type: str) -> uuid.UUID | None:
         return uuid.UUID(claims["sub"])
     except (jwt.PyJWTError, ValueError):
         return None
+
+
+def generate_refresh_token() -> str:
+    return secrets.token_urlsafe(48)
+
+
+def hash_refresh_token(token: str) -> str:
+    """Only this digest is stored, so a database leak does not yield usable refresh tokens."""
+    return hashlib.sha256(token.encode()).hexdigest()

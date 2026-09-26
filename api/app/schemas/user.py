@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 
@@ -22,6 +22,19 @@ class RegisterRequest(BaseModel):
     # No role field: public signup always creates a resident. Extras are rejected, not ignored.
     model_config = ConfigDict(extra="forbid")
 
+    name: Name
+    mobile: Mobile
+    email: Email
+    barangay_id: uuid.UUID
+    password: Password
+
+
+class CreateOfficialRequest(BaseModel):
+    """Admin-only. Officials are never created through public registration."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    role: Literal[UserRole.PERSONNEL, UserRole.ADMIN]
     name: Name
     mobile: Mobile
     email: Email

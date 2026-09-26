@@ -22,6 +22,28 @@ def register_resident(
     db: Session, *, name: str, mobile: str, email: str, barangay_id: uuid.UUID, password: str
 ) -> User:
     """Create a resident account. Inputs are already normalized by the request schema."""
+    return create_user(
+        db,
+        role=UserRole.RESIDENT,
+        name=name,
+        mobile=mobile,
+        email=email,
+        barangay_id=barangay_id,
+        password=password,
+    )
+
+
+def create_user(
+    db: Session,
+    *,
+    role: UserRole,
+    name: str,
+    mobile: str,
+    email: str,
+    barangay_id: uuid.UUID,
+    password: str,
+    email_verified: bool = False,
+) -> User:
     if db.get(Barangay, barangay_id) is None:
         raise BarangayNotFoundError
     if db.scalar(select(User.id).where(User.email == email)) is not None:
@@ -35,7 +57,8 @@ def register_resident(
         email=email,
         barangay_id=barangay_id,
         password_hash=security.hash_password(password),
-        role=UserRole.RESIDENT,
+        role=role,
+        email_verified_at=datetime.now(UTC) if email_verified else None,
     )
     db.add(user)
     try:
@@ -73,10 +96,6 @@ def get_user_from_access_token(db: Session, token: str) -> User:
     if user is None:
         raise AuthenticationRequiredError("Invalid or expired token.")
     return user
-
-
-def issue_access_token(user: User) -> str:
-    return security.create_access_token(user.id)
 
 
 def issue_verification_token(user: User) -> str:
