@@ -39,6 +39,18 @@ Full requirements and acceptance criteria: [docs/UGNAY-Project-Plan.md](docs/UGN
 - Record significant design decisions as a one-page ADR in `docs/adr/`.
 - If a requirement is ambiguous, ask rather than invent behavior. Check the plan's Open Questions section first.
 
+## Reporting back
+
+When a task or ticket is finished, give a detailed explanation of the work, written so a teammate who did not watch it can follow:
+
+- **What was done:** every task performed, grouped by area (code, database, tests, docs, tooling), with the files involved.
+- **Why:** the reasoning behind each notable choice, including decisions the ticket did not specify. Mark these clearly as assumptions so the team can confirm or overturn them.
+- **How it maps to the ticket:** state how each acceptance criterion was met and which test proves it.
+- **What was verified and how:** the commands run and their results. Say plainly what was not run or could not be verified, and what failed and how it was fixed.
+- **What remains:** follow-ups, out-of-scope items left for other stories, and anything the team must do next.
+
+Do not summarize only the outcome, and do not claim something works without saying how it was checked.
+
 ## Definition of Done (summary)
 
 Merged via reviewed PR · acceptance criteria met · CI green (ruff, pytest, eslint, tsc) · OpenAPI updated · migration runs on a fresh DB · no new secrets, PII in logs or public media paths · works on Android 8/11/14 and Chrome/Edge ≥1366×768. Full list: project plan §4.0.
