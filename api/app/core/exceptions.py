@@ -42,3 +42,13 @@ class InvalidVerificationTokenError(DomainError):
 class EmailNotVerifiedError(DomainError):
     code = "EMAIL_NOT_VERIFIED"
     default_message = "Verify your email address before submitting a report."
+
+
+class InvalidRefreshTokenError(DomainError):
+    code = "INVALID_REFRESH_TOKEN"
+    default_message = "The refresh token is invalid, expired or already used."
+
+
+class InsufficientRoleError(DomainError):
+    code = "FORBIDDEN"
+    default_message = "Your role is not allowed to perform this action."

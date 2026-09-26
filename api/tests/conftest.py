@@ -14,10 +14,12 @@ from sqlalchemy import create_engine, delete  # noqa: E402
 from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 from sqlalchemy.pool import StaticPool  # noqa: E402
 
+from app.core.enums import UserRole  # noqa: E402
+from app.core.security import hash_password  # noqa: E402
 from app.db.base import Base  # noqa: E402
 from app.db.session import get_db  # noqa: E402
 from app.main import create_app  # noqa: E402
-from app.models import Barangay, User  # noqa: E402
+from app.models import Barangay, RefreshToken, User  # noqa: E402
 from app.services.email_service import get_email_sender  # noqa: E402
 
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "sqlite://")
@@ -58,6 +60,7 @@ def db(engine) -> Iterator[Session]:
     with factory() as session:
         yield session
     with factory() as cleanup:
+        cleanup.execute(delete(RefreshToken))
         cleanup.execute(delete(User))
         cleanup.execute(delete(Barangay))
         cleanup.commit()
@@ -114,3 +117,31 @@ def auth_headers(client, make_payload):
         "/api/v1/auth/login", json={"email": payload["email"], "password": payload["password"]}
     )
     return {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+
+OFFICIAL_PASSWORD = "official-password"
+
+
+@pytest.fixture
+def make_official_headers(client, db, barangay):
+    """Insert a PERSONNEL or ADMIN user directly (the API has no public path) and log in."""
+
+    def make(role: UserRole) -> dict[str, str]:
+        email = f"{role.value.lower()}@example.com"
+        db.add(
+            User(
+                name=f"Test {role.value}",
+                mobile="+63917000" + ("1111" if role is UserRole.ADMIN else "2222"),
+                email=email,
+                barangay_id=barangay.id,
+                password_hash=hash_password(OFFICIAL_PASSWORD),
+                role=role,
+            )
+        )
+        db.commit()
+        login = client.post(
+            "/api/v1/auth/login", json={"email": email, "password": OFFICIAL_PASSWORD}
+        )
+        return {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    return make

@@ -18,10 +18,14 @@ The FastAPI OpenAPI spec (`/docs` and `/openapi.json` on a running server, expor
 | Me | `GET /me`, `PATCH /me`, `POST /me/consents`, `POST /me/device-tokens` |
 | Reports (resident) | `POST /reports`, `GET /reports`, `GET /reports/{id}`, `POST /reports/{id}/reopen`, `POST /reports/{id}/rating` |
 | Media | `POST /media/upload-url`, `GET /media/{id}/url` |
-| Admin | `GET /admin/reports`, `POST /admin/reports/{id}/validate`, `.../reject`, `.../category`, `.../priority`, `.../assign` |
+| Admin | `POST /admin/users` (create personnel/admin accounts), `GET /admin/reports`, `POST /admin/reports/{id}/validate`, `.../reject`, `.../category`, `.../priority`, `.../assign` |
 | Personnel | `GET /personnel/queue`, `POST /personnel/reports/{id}/status`, `POST /personnel/reports/{id}/resolution` |
 | Analytics | `GET /admin/analytics/summary`, `.../heatmap`, `.../barangays`, `GET /admin/exports/{csv|pdf}` |
 | Reference | `GET /enums` (statuses, categories, priority bands, rejection reasons), `GET /barangays` (public; registration form) |
+
+## Tokens
+
+`POST /auth/login` returns `access_token` (15 min) and `refresh_token` (7 d, opaque). `POST /auth/refresh` with `{ "refresh_token" }` returns a new pair and invalidates the one presented; replaying a used token revokes that login's whole token family. `POST /auth/logout` with `{ "refresh_token" }` revokes it (204, idempotent). Role failures return 403 with code `FORBIDDEN`.
 
 ## Errors
 
